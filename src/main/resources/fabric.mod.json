@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "indica",
+  "version": "${version}",
+  "name": "INDICA",
+  "description": "INDICA Addon for Meteor Client",
+  "authors": [
+    "Faye_one"
+  ],
+  "contact": {
+    "repo": ""
+  },
+  "icon": "assets/indica/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "dev.indica.INDICA.INDICA"
+    ]
+  },
+  "mixins": [
+    "INDICA.mixins.json"
+  ],
+  "custom": {
+    "meteor-client:color": "240,24,144"
+  },
+  "depends": {
+    "java": ">=21",
+    "minecraft": ["${mc_version}"],
+    "meteor-client": "*"
+  }
+}
