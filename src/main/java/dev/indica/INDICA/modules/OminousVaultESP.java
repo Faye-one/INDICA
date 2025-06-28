@@ -48,21 +48,21 @@ public class OminousVaultESP extends Module {
     private final Setting<SettingColor> fillColor = sgGeneral.add(new ColorSetting.Builder()
         .name("Side Color")
         .description("Color of sides.")
-        .defaultValue(new SettingColor(255, 0, 0, 50))
+        .defaultValue(new SettingColor(0, 120, 120, 50))
         .build()
     );
 
     private final Setting<SettingColor> outlineColor = sgGeneral.add(new ColorSetting.Builder()
         .name("Line Color")
         .description("Color of lines.")
-        .defaultValue(new SettingColor(255, 0, 0, 255))
+        .defaultValue(new SettingColor(31, 161, 159, 255))
         .build()
     );
 
     private final Setting<SettingColor> tracerColor = sgGeneral.add(new ColorSetting.Builder()
         .name("Tracer Color")
         .description("Color of tracer line.")
-        .defaultValue(new SettingColor(255, 255, 0, 255))
+        .defaultValue(new SettingColor(40, 200, 195, 255))
         .build()
     );
 

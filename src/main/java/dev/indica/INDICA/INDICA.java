@@ -3,6 +3,7 @@ package dev.indica.INDICA;
 import dev.indica.INDICA.modules.OminousVaultESP;
 import dev.indica.INDICA.commands.CommandExample;
 import dev.indica.INDICA.hud.HudExample;
+import dev.indica.INDICA.modules.ShulkerFrameESP;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
@@ -22,6 +23,7 @@ public class INDICA extends MeteorAddon {
     @Override
     public void onInitialize() {
         Modules.get().add(new OminousVaultESP());
+        Modules.get().add(new ShulkerFrameESP());
         LOG.info("Initializing INDICA");
 
         // Commands
@@ -39,7 +41,7 @@ public class INDICA extends MeteorAddon {
 
     @Override
     public String getPackage() {
-        return "com.example.addon";
+        return "dev.indica.INDICA";
     }
 
     @Override

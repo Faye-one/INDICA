@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom") version "1.10-SNAPSHOT"
+    id("fabric-loom") version "1.9-SNAPSHOT"
 }
 
 base {
@@ -61,6 +61,6 @@ tasks {
 
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release = 21
+        // options.release = 21
     }
 }
