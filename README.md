@@ -4,8 +4,8 @@ INDICA is a lightweight addon module for the [Meteor Client](https://meteorclien
 
 ## 🔍 Features
 
-  OminousVaultESP: Highlights Ominous Vaults in the world when nearby.
-  ShulkerFrameESP: Highlights (Glow-)Itemframes but only if they contain a Shulkerbox.
+- OminousVaultESP: Highlights Ominous Vaults in the world when nearby.
+- ShulkerFrameESP: Highlights (Glow-)Itemframes but only if they contain a Shulkerbox.
 
   Minimal and focused: No unnecessary clutter.
 
