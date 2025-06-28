@@ -13,13 +13,13 @@ INDICA is a lightweight addon module for the [Meteor Client](https://meteorclien
   2. Make sure you have the latest [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files) installed - i recommend fabric-api-0.119.3+1.21.4.jar
   3. Clone this repository or download the ZIP.
   4. Unpack the .zip
-  5. run cmd in the main folder
+  5. Run cmd in the main folder
   6. Build the module using Gradle:
 
     ./gradlew build
 
   7. Grab the .jar from "build/libs" and place it into your Minecraft mods folder.
-  8. Launch Minecraft and enable the OminousVaultESP module from the Meteor GUI
+  8. done
 
 ## Known Issues
 
