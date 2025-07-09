@@ -6,6 +6,11 @@ INDICA is a lightweight addon module for the [Meteor Client](https://meteorclien
 
 - OminousVaultESP: Highlights Ominous Vaults in the world when nearby.
 - ShulkerFrameESP: Highlights (Glow-)Itemframes but only if they contain a Shulkerbox.
+- KillEffects: Displays visual and audio effects when selected entities die.
+  - Entity Effects: Spawn lightning bolts at death locations
+  - Particle Effects: Dynamic particle selection
+  - Sound Effects: Entity sound selection with volume control
+  - Entity Filter: Configure which entity types trigger effects
 
 ## 📦 Installation
 
