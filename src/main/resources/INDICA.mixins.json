@@ -3,7 +3,8 @@
   "package": "dev.indica.INDICA.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ExampleMixin"
+    "RespawnPointBlockerMixin",
+    "RespawnPointBlockerSpamMixin"
   ],
   "injectors": {
     "defaultRequire": 1

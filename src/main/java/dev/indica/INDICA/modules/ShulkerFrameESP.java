@@ -66,7 +66,7 @@ public class ShulkerFrameESP extends Module {
     );
 
     public ShulkerFrameESP() {
-        super(INDICA.INDICA_CATEGORY, "ShulkerFrameESP", "Highlights ItemFrames and GlowItemFrames containing any shulkerbox.");
+        super(INDICA.INDICA_CATEGORY, "Shulker-Frame-ESP", "Highlights ItemFrames and GlowItemFrames containing any Shulkerbox.");
     }
 
     // Helper: Checks if the given ItemStack is any shulkerbox

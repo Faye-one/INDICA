@@ -73,7 +73,7 @@ public class KillEffects extends Module {
 
     public final Setting<List<SoundEvent>> soundEvents = sgGeneral.add(new SoundEventListSetting.Builder()
         .name("sound-events")
-        .description("Types of sounds to play. Only the first selected sound will be played.")
+        .description("Types of sounds to play. Only the first sound in the list will be played.")
         .defaultValue(SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER)
         .visible(() -> effectType.get() == EffectType.PARTICLE)
         .build()

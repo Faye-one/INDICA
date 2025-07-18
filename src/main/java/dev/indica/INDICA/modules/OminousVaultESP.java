@@ -23,7 +23,7 @@ import net.minecraft.registry.Registries;
 
 public class OminousVaultESP extends Module {
     public OminousVaultESP() {
-        super(INDICA.INDICA_CATEGORY, "Ominous Vault ESP", "Highlights ominous vaults.");
+        super(INDICA.INDICA_CATEGORY, "Ominous-Vault-ESP", "Highlights Ominous Vaults.");
 
         // Initial-Scan beim Weltbeitritt (funktioniert immer, Fabric-API)
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
