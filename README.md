@@ -12,6 +12,7 @@ INDICA is a lightweight addon module for the [Meteor Client](https://meteorclien
   - Sound Effects: Entity sound selection with volume control
   - Entity Filter: Configure which entity types trigger effects
 - Respawn Point Blocker: Attempts to block interactions with beds and/or respawn anchors.
+- Map Copier: Automatically duplicates all maps in the players inventory.
 
 ## 📦 Installation
 
@@ -22,7 +23,7 @@ INDICA is a lightweight addon module for the [Meteor Client](https://meteorclien
   5. Run cmd in the main folder
   6. Build the module using Gradle:
 
-    ./gradlew build
+    gradlew.bat build
 
   7. Grab the .jar from "build/libs" and place it into your Minecraft mods folder.
   8. done

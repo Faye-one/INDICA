@@ -5,6 +5,7 @@ import dev.indica.INDICA.commands.CommandExample;
 import dev.indica.INDICA.hud.HudExample;
 import dev.indica.INDICA.hud.KillEffectsHud;
 import dev.indica.INDICA.modules.ShulkerFrameESP;
+import dev.indica.INDICA.modules.MapDuplicator;
 import dev.indica.INDICA.modules.KillEffects;
 import dev.indica.INDICA.modules.RespawnPointBlocker;
 import meteordevelopment.meteorclient.addons.GithubRepo;
@@ -26,6 +27,7 @@ public class INDICA extends MeteorAddon {
         Modules.get().add(new ShulkerFrameESP());
         Modules.get().add(new KillEffects());
         Modules.get().add(new RespawnPointBlocker());
+        Modules.get().add(new MapDuplicator());
 
         // Commands
         Commands.add(new CommandExample());
@@ -48,6 +50,6 @@ public class INDICA extends MeteorAddon {
 
     @Override
     public GithubRepo getRepo() {
-        return new GithubRepo("MeteorDevelopment", "meteor-addon-template");
+        return new GithubRepo("Faye_one", "INDICA");
     }
 }
