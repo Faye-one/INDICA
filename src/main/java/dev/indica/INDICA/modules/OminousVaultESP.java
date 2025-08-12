@@ -1,9 +1,7 @@
 package dev.indica.INDICA.modules;
 
 import meteordevelopment.meteorclient.settings.*;
-import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.property.Property;
@@ -13,33 +11,32 @@ import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.orbit.EventHandler;
 import java.util.HashSet;
 import java.util.Set;
-import meteordevelopment.meteorclient.events.world.TickEvent;
 import net.minecraft.world.chunk.WorldChunk;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import net.minecraft.util.math.ChunkPos;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.registry.Registries;
 
 public class OminousVaultESP extends Module {
     public OminousVaultESP() {
         super(INDICA.INDICA_CATEGORY, "Ominous-Vault-ESP", "Highlights Ominous Vaults.");
 
-        // Initial-Scan beim Weltbeitritt (funktioniert immer, Fabric-API)
+        // Queue initial chunk scan on world join, paced over ~3.5s
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (mc.world == null || mc.player == null) return;
-            int minY = mc.world.getBottomY();
-            int maxY = mc.world.getHeight();
+            initialScanQueue.clear();
             int chunkRadius = mc.options.getViewDistance().getValue();
+            int totalChunks = (2 * chunkRadius + 1) * (2 * chunkRadius + 1);
+            int durationTicks = 70; // ~3.5s at 20 TPS
+            initialScanChunksPerTick = Math.max(1, (int) Math.ceil(totalChunks / (double) durationTicks));
             for (int cx = mc.player.getChunkPos().x - chunkRadius; cx <= mc.player.getChunkPos().x + chunkRadius; cx++) {
                 for (int cz = mc.player.getChunkPos().z - chunkRadius; cz <= mc.player.getChunkPos().z + chunkRadius; cz++) {
-                    var chunk = mc.world.getChunk(cx, cz);
-                    if (chunk instanceof WorldChunk worldChunk) {
-                        ChunkPos chunkPos = worldChunk.getPos();
-                        scanChunkForVaults(chunkPos, minY, maxY);
-                    }
+                    initialScanQueue.addLast(new ChunkPos(cx, cz));
                 }
             }
+            initialScanActive = true;
         });
     }
 
@@ -91,15 +88,37 @@ public class OminousVaultESP extends Module {
     private final Map<ChunkPos, Set<BlockPos>> chunkVaults = new HashMap<>();
     private Set<ChunkPos> lastLoadedChunks = new HashSet<>();
     private long lastRecheckTime = 0;
-    private final int recheckIntervalMs = 4000; // alle 4 Sekunden
-    private final Map<ChunkPos, Integer> pendingChunks = new HashMap<>(); // ChunkPos -> Ticks bis Scan
+    private final int recheckIntervalMs = 4000;
+    private final Map<ChunkPos, Integer> pendingChunks = new HashMap<>();
+
+    // Initial join scan pacing
+    private final Deque<ChunkPos> initialScanQueue = new ArrayDeque<>();
+    private boolean initialScanActive = false;
+    private int initialScanChunksPerTick = 0;
 
     private long lastFullRescan = 0;
-    private final int fullRescanIntervalMs = 3000; // alle 3 Sekunden
+    private final int fullRescanIntervalMs = 3000;
 
     @EventHandler
     private void onTick(meteordevelopment.meteorclient.events.world.TickEvent.Pre event) {
         if (mc.world == null || mc.player == null) return;
+        // Process initial scan queue
+        if (initialScanActive) {
+            int processed = 0;
+            int minY0 = mc.world.getBottomY();
+            int maxY0 = mc.world.getHeight();
+            while (processed < initialScanChunksPerTick && !initialScanQueue.isEmpty()) {
+                ChunkPos cp = initialScanQueue.pollFirst();
+                // Scan only if chunk is loaded as WorldChunk
+                var chunk = mc.world.getChunk(cp.x, cp.z);
+                if (chunk instanceof WorldChunk) {
+                    scanChunkForVaults(cp, minY0, maxY0);
+                }
+                processed++;
+            }
+            if (initialScanQueue.isEmpty()) initialScanActive = false;
+        }
+
         Set<ChunkPos> currentChunks = new HashSet<>();
         BlockPos playerPos = mc.player.getBlockPos();
         int chunkRadius = mc.options.getViewDistance().getValue();
@@ -112,25 +131,21 @@ public class OminousVaultESP extends Module {
             }
         }
 
-        // Neue und entladene Chunks erkennen
         Set<ChunkPos> newChunks = new HashSet<>(currentChunks);
         newChunks.removeAll(lastLoadedChunks);
         Set<ChunkPos> unloadedChunks = new HashSet<>(lastLoadedChunks);
         unloadedChunks.removeAll(currentChunks);
 
-        // Vaults aus entladenen Chunks entfernen
         for (ChunkPos chunkPos : unloadedChunks) {
             Set<BlockPos> removed = chunkVaults.remove(chunkPos);
             if (removed != null) ominousVaults.removeAll(removed);
             pendingChunks.remove(chunkPos);
         }
 
-        // Neue Chunks mit Delay zum Pending-Scan eintragen (jetzt 10 Ticks)
         for (ChunkPos chunkPos : newChunks) {
-            pendingChunks.put(chunkPos, 10); // 10 Ticks warten
+            pendingChunks.put(chunkPos, 10);
         }
 
-        // Pending Chunks nach Ablauf des Countdowns scannen
         Set<ChunkPos> toScan = new HashSet<>();
         for (Map.Entry<ChunkPos, Integer> entry : new HashMap<>(pendingChunks).entrySet()) {
             int ticksLeft = entry.getValue() - 1;
@@ -142,7 +157,7 @@ public class OminousVaultESP extends Module {
             pendingChunks.remove(chunkPos);
         }
 
-        // 6. Gecachte Vaults regelmäßig rechecken (Existenz & ominous)
+        // Periodically validate cached vaults
         long now = System.currentTimeMillis();
         if (now - lastRecheckTime >= recheckIntervalMs) {
             lastRecheckTime = now;
@@ -164,7 +179,6 @@ public class OminousVaultESP extends Module {
             for (Set<BlockPos> set : chunkVaults.values()) set.removeAll(toRemoveVaults);
         }
 
-        // Periodischer Full-Rescan aller geladenen Chunks alle 3 Sekunden
         if (now - lastFullRescan >= fullRescanIntervalMs) {
             lastFullRescan = now;
             for (ChunkPos chunkPos : lastLoadedChunks) {
@@ -175,7 +189,6 @@ public class OminousVaultESP extends Module {
         lastLoadedChunks = currentChunks;
     }
 
-    // Scannt einen Chunk nach Ominous Vaults (BlockEntities)
     private boolean scanChunkForVaults(ChunkPos chunkPos, int minY, int maxY) {
         net.minecraft.world.chunk.Chunk chunk;
         try {

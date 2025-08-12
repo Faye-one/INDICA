@@ -1,6 +1,7 @@
 package dev.indica.INDICA;
 
 import dev.indica.INDICA.modules.OminousVaultESP;
+import dev.indica.INDICA.modules.InventoryNotif;
 import dev.indica.INDICA.commands.CommandExample;
 import dev.indica.INDICA.hud.HudExample;
 import dev.indica.INDICA.hud.KillEffectsHud;
@@ -28,6 +29,7 @@ public class INDICA extends MeteorAddon {
         Modules.get().add(new KillEffects());
         Modules.get().add(new RespawnPointBlocker());
         Modules.get().add(new MapDuplicator());
+        Modules.get().add(new InventoryNotif());
 
         // Commands
         Commands.add(new CommandExample());
