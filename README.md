@@ -14,6 +14,7 @@ INDICA is a lightweight addon module for the [Meteor Client](https://meteorclien
 - Respawn Point Blocker: Attempts to block interactions with beds and/or respawn anchors.
 - Map Copier: Automatically duplicates all maps in the players inventory.
 - Inventory Notifs: Plays a Soundqueue on different events inside your inventory.
+- Console HUD: Shows system/console messages in a dedicated HUD element, with filters and a custom whitelist.
 
 ## 📦 Installation
 

@@ -3,8 +3,7 @@ package dev.indica.INDICA;
 import dev.indica.INDICA.modules.OminousVaultESP;
 import dev.indica.INDICA.modules.InventoryNotif;
 import dev.indica.INDICA.commands.CommandExample;
-import dev.indica.INDICA.hud.HudExample;
-import dev.indica.INDICA.hud.KillEffectsHud;
+import dev.indica.INDICA.hud.ConsoleHud;
 import dev.indica.INDICA.modules.ShulkerFrameESP;
 import dev.indica.INDICA.modules.MapDuplicator;
 import dev.indica.INDICA.modules.KillEffects;
@@ -18,8 +17,8 @@ import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 
 public class INDICA extends MeteorAddon {
-    public static final Category CATEGORY = new Category("Example");
-    public static final HudGroup HUD_GROUP = new HudGroup("Example");
+    public static final Category CATEGORY = new Category("INDICA");
+    public static final HudGroup HUD_GROUP = new HudGroup("INDICA");
     public static final Category INDICA_CATEGORY = new Category("INDICA");
 
     @Override
@@ -35,8 +34,10 @@ public class INDICA extends MeteorAddon {
         Commands.add(new CommandExample());
 
         // HUD
-        Hud.get().register(HudExample.INFO);
-        Hud.get().register(KillEffectsHud.INFO);
+        Hud.get().register(ConsoleHud.INFO);
+
+        // Subscribe console listener
+        ConsoleHud.registerListener();
     }
 
     @Override
