@@ -32,7 +32,8 @@ INDICA is a lightweight addon module for the [Meteor Client](https://meteorclien
 
 ## Known Issues
 
-- none :)
+- Map Copier: Does not copy properly if more than one stack of empty maps are present in the players Inventory.
+  - Temp fix: Do not have more than one stack of empty maps in your Inventory.
 
 ## License
 
