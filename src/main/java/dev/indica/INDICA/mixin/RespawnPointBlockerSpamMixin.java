@@ -12,6 +12,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,8 +24,8 @@ public class RespawnPointBlockerSpamMixin {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
-        RespawnPointBlocker module = Modules.get().get(RespawnPointBlocker.class);
-        if (!module.isActive()) return;
+		RespawnPointBlocker module = Modules.get().get(RespawnPointBlocker.class);
+		if (module == null || !module.isActive()) return;
 
         ClientPlayerEntity player = MeteorClient.mc.player;
         if (player == null || MeteorClient.mc.world == null) return;
@@ -36,13 +37,13 @@ public class RespawnPointBlockerSpamMixin {
             BlockState blockState = MeteorClient.mc.world.getBlockState(blockPos);
             Block block = blockState.getBlock();
 
-            // Check if crosshair is on a respawn point block
-            if (isRespawnPointBlock(block)) {
+			// Check if crosshair is on a respawn point block
+			if (indica$isRespawnPointBlock(block)) {
                 boolean shouldBlock = false;
 
-                if (isBed(block) && module.blockBeds.get()) {
+				if (indica$isBed(block) && module.blockBeds.get()) {
                     shouldBlock = true;
-                } else if (block == Blocks.RESPAWN_ANCHOR && module.blockRespawnAnchors.get()) {
+				} else if (block == Blocks.RESPAWN_ANCHOR && module.blockRespawnAnchors.get()) {
                     shouldBlock = true;
                 }
 
@@ -55,11 +56,13 @@ public class RespawnPointBlockerSpamMixin {
         }
     }
 
-    private boolean isRespawnPointBlock(Block block) {
-        return isBed(block) || block == Blocks.RESPAWN_ANCHOR;
+	@Unique
+	private boolean indica$isRespawnPointBlock(Block block) {
+		return indica$isBed(block) || block == Blocks.RESPAWN_ANCHOR;
     }
 
-    private boolean isBed(Block block) {
+	@Unique
+	private boolean indica$isBed(Block block) {
         return block == Blocks.WHITE_BED || block == Blocks.ORANGE_BED || block == Blocks.MAGENTA_BED ||
                block == Blocks.LIGHT_BLUE_BED || block == Blocks.YELLOW_BED || block == Blocks.LIME_BED ||
                block == Blocks.PINK_BED || block == Blocks.GRAY_BED || block == Blocks.LIGHT_GRAY_BED ||

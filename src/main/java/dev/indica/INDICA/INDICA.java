@@ -26,7 +26,10 @@ public class INDICA extends MeteorAddon {
         Modules.get().add(new OminousVaultESP());
         Modules.get().add(new ShulkerFrameESP());
         Modules.get().add(new KillEffects());
-        Modules.get().add(new RespawnPointBlocker());
+        // Register RespawnPointBlocker only if bephax is not loaded
+        if (!net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("bephax")) {
+            Modules.get().add(new RespawnPointBlocker());
+        }
         Modules.get().add(new MapDuplicator());
         Modules.get().add(new InventoryNotif());
 

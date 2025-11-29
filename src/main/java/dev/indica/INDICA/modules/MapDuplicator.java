@@ -300,6 +300,8 @@ public class MapDuplicator extends Module {
         
         switch (craftingStep) {
             case 0: // Place filled map in crafting grid slot 1
+                // Ensure grid is clean before starting a new map
+                clearCraftingGrid();
                 if (isValidSlot(currentTask.mapSlot)) {
                     InvUtils.click().slotId(currentTask.mapSlot);
                     if (isValidSlot(1)) {
@@ -313,7 +315,7 @@ public class MapDuplicator extends Module {
                 break;
                 
             case 1: // Find and place empty map in crafting grid slot 2
-                int emptyMapSlot = findNextEmptyMap();
+                int emptyMapSlot = findBestEmptyMapSlot();
                 if (emptyMapSlot != -1) {
                     if (isValidSlot(emptyMapSlot)) {
                         InvUtils.click().slotId(emptyMapSlot);
@@ -356,6 +358,10 @@ public class MapDuplicator extends Module {
                 if (isValidSlot(1) && isValidSlot(currentTask.mapSlot)) {
                     // Use shift-click to automatically stack with existing items
                     InvUtils.shiftClick().slotId(1);
+                }
+                // Also clear slot 2 in case an extra empty map remains
+                if (isValidSlot(2)) {
+                    InvUtils.shiftClick().slotId(2);
                 }
                 craftingStep = 5;
                 break;
@@ -436,44 +442,43 @@ public class MapDuplicator extends Module {
         return -1;
     }
 
-    private int findNextEmptyMap() {
-        // First check hotbar slots (0-8)
+    private int findBestEmptyMapSlot() {
+        int bestSlot = -1;
+        int bestCount = -1;
+        for (int i = 9; i < mc.player.getInventory().size(); i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (stack.getItem() == Items.MAP && stack.getCount() > bestCount) {
+                bestCount = stack.getCount();
+                bestSlot = SlotUtils.indexToId(i);
+            }
+        }
+        if (bestSlot != -1) return bestSlot;
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() == Items.MAP) {
-                return SlotUtils.indexToId(i);
+            if (stack.getItem() == Items.MAP && stack.getCount() > bestCount) {
+                bestCount = stack.getCount();
+                bestSlot = SlotUtils.indexToId(i);
             }
         }
-        
-        // Then check main inventory slots (9-35)
-        for (int i = 9; i < 36; i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() == Items.MAP) {
-                return SlotUtils.indexToId(i);
-            }
-        }
-        
-        // Then check crafting grid slots
         ScreenHandler handler = mc.player.currentScreenHandler;
         if (handler instanceof PlayerScreenHandler) {
-            // Player inventory crafting (2x2 grid, slots 1-4)
             for (int i = 1; i <= 4; i++) {
                 ItemStack stack = handler.getSlot(i).getStack();
-                if (stack.getItem() == Items.MAP) {
-                    return i;
+                if (stack.getItem() == Items.MAP && stack.getCount() > bestCount) {
+                    bestCount = stack.getCount();
+                    bestSlot = i;
                 }
             }
         } else if (handler instanceof CraftingScreenHandler) {
-            // Crafting table (3x3 grid, slots 1-9)
             for (int i = 1; i <= 9; i++) {
                 ItemStack stack = handler.getSlot(i).getStack();
-                if (stack.getItem() == Items.MAP) {
-                    return i;
+                if (stack.getItem() == Items.MAP && stack.getCount() > bestCount) {
+                    bestCount = stack.getCount();
+                    bestSlot = i;
                 }
             }
         }
-        
-        return -1;
+        return bestSlot;
     }
 
     private void finishCrafting() {

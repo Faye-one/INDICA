@@ -51,6 +51,24 @@ public class ConsoleHud extends HudElement {
         .build()
     );
 
+    // Place Max Width right under Max Lines
+    private final Setting<Integer> maxWidth = sgGeneral.add(new IntSetting.Builder()
+        .name("max-width")
+        .description("Maximum width in pixels before wrapping. Set 0 for unlimited.")
+        .defaultValue(220)
+        .range(0, 1000)
+        .sliderRange(100, 500)
+        .build()
+    );
+
+    // Dynamic background directly under Max Width
+    private final Setting<Boolean> dynamicBackground = sgGeneral.add(new BoolSetting.Builder()
+        .name("dynamic-background")
+        .description("Background adapts to content when enabled; otherwise uses fixed size from max-lines and max-width.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<Boolean> timestamps = sgGeneral.add(new BoolSetting.Builder()
         .name("timestamps")
         .description("Show timestamps.")
@@ -58,24 +76,24 @@ public class ConsoleHud extends HudElement {
         .build()
     );
 
-    // Filters
-    private final Setting<Boolean> showMeteor = sgGeneral.add(new BoolSetting.Builder()
+    // Filters (moved to Whitelist tab)
+    private final Setting<Boolean> showMeteor = sgWhitelist.add(new BoolSetting.Builder()
         .name("show-meteor")
         .description("Show [Meteor] messages.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<Boolean> showSystem = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> showSystem = sgWhitelist.add(new BoolSetting.Builder()
         .name("show-system")
         .description("Show system/console messages.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<Boolean> showChatTag = sgGeneral.add(new BoolSetting.Builder()
-        .name("show-chat-tag")
-        .description("Show [CHAT] messages (only if system is shown).")
+    private final Setting<Boolean> showChatTag = sgWhitelist.add(new BoolSetting.Builder()
+        .name("show-chat")
+        .description("Show [CHAT] messages.")
         .defaultValue(false)
         .visible(() -> showSystem.get())
         .build()
@@ -99,15 +117,6 @@ public class ConsoleHud extends HudElement {
         .name("background-color")
         .description("Background color.")
         .defaultValue(new SettingColor(0, 0, 0, 90))
-        .build()
-    );
-
-    private final Setting<Integer> maxWidth = sgGeneral.add(new IntSetting.Builder()
-        .name("max-width")
-        .description("Maximum width in pixels before wrapping. Set 0 for unlimited.")
-        .defaultValue(220)
-        .range(0, 1000)
-        .sliderRange(100, 500)
         .build()
     );
 
@@ -150,15 +159,27 @@ public class ConsoleHud extends HudElement {
 
         double height = lineHeight * renderedLines.size();
 
-        // In HUD editor, always reserve box for configured size even if empty/hidden
-        if (isInEditor()) {
-            double editorWidth = maxWidth.get() > 0 ? Math.min(width, maxWidth.get()) : width;
-            if (editorWidth == 0) editorWidth = Math.max(renderer.textWidth(" ", true), maxWidth.get() > 0 ? maxWidth.get() : 120);
-            double editorHeight = Math.max(height, lineHeight * Math.max(1, maxLines.get()));
-            setSize(editorWidth + 6, editorHeight + 6);
+        // Compute target background size based on dynamic or fixed mode
+        boolean dyn = dynamicBackground.get();
+        double bgWidth;
+        double bgHeight;
+        if (dyn) {
+            if (isInEditor()) {
+                double editorWidth = maxWidth.get() > 0 ? Math.min(width, maxWidth.get()) : width;
+                if (editorWidth == 0) editorWidth = Math.max(renderer.textWidth(" ", true), maxWidth.get() > 0 ? maxWidth.get() : 120);
+                double editorHeight = Math.max(height, lineHeight * Math.max(1, maxLines.get()));
+                bgWidth = editorWidth;
+                bgHeight = editorHeight;
+            } else {
+                bgWidth = width;
+                bgHeight = height;
+            }
         } else {
-            setSize(width + 6, height + 6);
+            // Fixed background uses configured max-width (if > 0) and max-lines
+            bgWidth = maxWidth.get() > 0 ? maxWidth.get() : Math.max(width, 120);
+            bgHeight = lineHeight * Math.max(1, maxLines.get());
         }
+        setSize(bgWidth + 6, bgHeight + 6);
 
         renderer.quad(x, y, getWidth(), getHeight(), new Color(backgroundColor.get()));
 

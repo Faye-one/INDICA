@@ -16,6 +16,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -25,18 +26,19 @@ public class RespawnPointBlockerMixin {
     
     @Inject(method = "interactBlock", at = @At("HEAD"), cancellable = true)
     private void onInteractBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("bephax")) return;
         RespawnPointBlocker module = Modules.get().get(RespawnPointBlocker.class);
-        if (!module.isActive()) return;
+        if (module == null || !module.isActive()) return;
 
         BlockPos blockPos = hitResult.getBlockPos();
         BlockState blockState = MeteorClient.mc.world.getBlockState(blockPos);
         Block block = blockState.getBlock();
 
         // Check if this is a respawn point block interaction
-        if (isRespawnPointBlock(block)) {
+        if (indica$isRespawnPointBlock(block)) {
             boolean shouldBlock = false;
 
-            if (isBed(block) && module.blockBeds.get()) {
+            if (indica$isBed(block) && module.blockBeds.get()) {
                 shouldBlock = true;
             } else if (block == Blocks.RESPAWN_ANCHOR && module.blockRespawnAnchors.get()) {
                 shouldBlock = true;
@@ -49,11 +51,13 @@ public class RespawnPointBlockerMixin {
         }
     }
 
-    private boolean isRespawnPointBlock(Block block) {
-        return isBed(block) || block == Blocks.RESPAWN_ANCHOR;
+    @Unique
+    private boolean indica$isRespawnPointBlock(Block block) {
+        return indica$isBed(block) || block == Blocks.RESPAWN_ANCHOR;
     }
 
-    private boolean isBed(Block block) {
+    @Unique
+    private boolean indica$isBed(Block block) {
         return block == Blocks.WHITE_BED || block == Blocks.ORANGE_BED || block == Blocks.MAGENTA_BED ||
                block == Blocks.LIGHT_BLUE_BED || block == Blocks.YELLOW_BED || block == Blocks.LIME_BED ||
                block == Blocks.PINK_BED || block == Blocks.GRAY_BED || block == Blocks.LIGHT_GRAY_BED ||
@@ -63,7 +67,7 @@ public class RespawnPointBlockerMixin {
     }
 
     private void provideFeedback(RespawnPointBlocker module, Block block) {
-        String blockName = isBed(block) ? "Bed" : "Respawn Anchor";
+        String blockName = indica$isBed(block) ? "Bed" : "Respawn Anchor";
         
         if (module.chatFeedback.get()) {
             module.info("Blocked %s interaction", blockName);
